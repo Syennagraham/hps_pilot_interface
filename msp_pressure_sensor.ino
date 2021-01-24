@@ -1,10 +1,10 @@
 /* 
  *  This example reads a pressure sensor out to an LCD screen using Arduino UNO
  *  
- *  Pins from pressure sensor to Arduino
+ *  Pins from pressure sensor to MSP
  *  PS Black to GND
  *  PS Red to 5V
- *  PS Yellow to arduino A1
+ *  PS Yellow to MSP P6.0
  *  
  */
 
