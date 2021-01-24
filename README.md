@@ -18,6 +18,7 @@ If your desired setup includes the MSP-EXP432P401R, the logic level converter (L
 |||`GND`||`Black wire`
 |||`P6.0`||`Yellow wire`
 
+![Picture of Pin Connections to LCD](https://cdn.sparkfun.com/assets/learn_tutorials/7/8/9/logiclevelhighlight2.jpg)
 
 
 ## Files included in this Repository
