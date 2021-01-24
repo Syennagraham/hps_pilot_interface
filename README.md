@@ -40,6 +40,8 @@ Changes the backlight color of the LCD screen using Arduino.
 Useful for resetting the LCD screen.
 
 ## Helpful References
+[LCD Commands](https://media.digikey.com/pdf/Data%20Sheets/Sparkfun%20PDFs/AVR_Based_Serial_Enabled_LCDs_HookupGuide_Web.pdf)
+
 [LCD - Microcontroller Hook Up Guide/Picture](https://cdn.sparkfun.com/assets/learn_tutorials/7/8/9/logiclevelhighlight2.jpg)
 
 [MSP Pin Descriptions](https://energia.nu/pinmaps/img/MSP-EXP432P401R.jpg)
