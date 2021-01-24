@@ -1,10 +1,10 @@
 /* 
- *  This example reads a pressure sensor out to an LCD screen using Arduino UNO
+ *  This example reads a pressure sensor out to an LCD screen using MSP-EXP432P401R
  *  
  *  Pins from pressure sensor to MSP
  *  PS Black to GND
  *  PS Red to 5V
- *  PS Yellow to MSP P6.0
+ *  PS Yellow to MSP pin P6.0
  *  
  */
 
