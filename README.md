@@ -1,9 +1,53 @@
 # hps_pilot_interface
-The purpose of this repository is to provide a HPS pilot interface where the screen will become **RED** if the pilot is too close to the surface or the bottom and will become **GREEN** if the pilot is in the middle of the pool based on pressure/depth. 
+The purpose of this repository is to provide a HPS pilot interface where the screen will become **RED** if the pilot is too close to the surface or the bottom and will become **GREEN** if the pilot is in the middle of the pool based on pressure/depth. This code will also read two RPM sensors and their average RPM out to the screen.
+
+# TO DO:
+ 1. Make PCB work
+ 2. Test pressure sensors and calibrate them
+ 3. Correlate depth data to color in main loop
+ 4. Add SD card output
 
 # Pin Connections
 If your desired setup includes the MSP-EXP432P401R, the logic level converter (LLC), the LCD screen and the pressure sensor, use these pin connections below.
 
+## PCB Pin Connections 
+### LCD - I2C instead of serial
+
+From the Batteries:
+
+red(4): GND
+
+brown(3):  3.3
+
+gray(2): 6.4
+
+green(1): 6.5
+
+### Pressure - Analog
+
+From Logger card out:
+
+Brown and Blue: GND  1 & 4
+
+Gray(2): P4.0
+
+Purple & Yellow (3&6): +12
+
+Green (5): P6.1
+
+### RPM - Analog
+
+From Logger card out:
+
+Purple and White: GND  1 & 4
+
+Orange(2): P2.6
+
+Black and Green (3&6): +12
+
+Red(5): P2.4
+
+## Old pin connections with a LLC
 |MSP-EXP432P401R |LLC  | Breadboard | LCD | Pressure Sensor |
 |----------------|--------------|------------|-------------------| ---|
 |`5V` |`'HV'`                      		
