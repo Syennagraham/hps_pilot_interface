@@ -2,32 +2,32 @@
  * This code displays RPM data to the LCD using I2C
  *  * Proximity sensor A 
  *    Blue  - GND
- *    Black - P2.6
+ *    Black - 3
  *    Brown - 5V
  * Proximity sensor B
  *    Blue  - GND
- *    Black - P2.4
+ *    Black - 4
  *    Brown - 5V  
  * LCD
  *    RAW - 3.3V
  *    GND - GND
- *    SDA - P6.4
- *    SCL - P6.5
+ *    SDA - Arduino SDA
+ *    SCL - Arduino SCL
  *    
  * By: Syenna Graham   
  * 
  * TO DO:
  * 1. Test pressure sensors
  * 2. Correlate depth data to color in main loop
- * 3. Make PCB work
+ * 3. Output data to SD card
  */
 
 #include <Wire.h>
 
 #define DISPLAY_ADDRESS1 0x72 //This is the default address of the OpenLCD
 
-const int dataINA = 39; //Proximity sensor input A (PSA)
-const int dataINB = 38; //Proximity sensor input B (PSB) 
+const int dataINA = 3; //Proximity sensor input A (PSA)
+const int dataINB = 4; //Proximity sensor input B (PSB) 
 
 unsigned long prevmillis; // To store time
 unsigned long duration; // To store time difference
@@ -87,7 +87,7 @@ void rpm_value()
    Wire.write('-'); //Send clear display command
    
    // RPMA Measurement
-   currentstateA = digitalRead(dataINA); // Read PSA sensor state
+   currentstateA = digitalRead(dataINA); // Read RPMA sensor state
    if( prevstateA != currentstateA) // If there is change in input
      {
        if( currentstateA == HIGH ) // If input only changes from LOW to HIGH
@@ -96,7 +96,12 @@ void rpm_value()
            rpmA = (60000000/duration); // rpm = (1/ time millis)*1000*1000*60;
            prevmillis = micros(); // store time for nect revolution calculation
          }
+       else
+        {
+        rpmA = 0;
+        }
      }
+ 
     prevstateA = currentstateA; // store this scan (prev scan) data for next scan
     Serial.println("RPM A .. ");
     Serial.println(rpmA);
@@ -111,6 +116,10 @@ void rpm_value()
            duration = ( micros() - prevmillis ); // Time difference between revolution in microsecond
            rpmB = (60000000/duration); // rpm = (1/ time millis)*1000*1000*60;
            prevmillis = micros(); // store time for next revolution calculation
+         }
+        else
+         {
+           rpmB = 0;
          }
      }
     prevstateB = currentstateB; // store this scan (prev scan) data for next scan
@@ -152,8 +161,8 @@ int depth()  // Get the pressure from the pressure sensor
       Serial.print(pressure_bar);
       Serial.println(" bars");
       
-      Serial1.print("Pressure: ");
-      Serial1.println(pressure_bar);    
+      Wire.print("Pressure: ");
+      Wire.println(pressure_bar);    
       
       delay(3000);
       //return pressure_bar;
