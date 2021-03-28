@@ -1,25 +1,32 @@
 /*
  * This code displays RPM data to the LCD using I2C
- *  * Proximity sensor A 
- *    Blue  - GND
- *    Black - 3
- *    Brown - 5V
+ * Proximity sensor A 
+ *    Blue  - Arduino GND
+ *    Black - Arduino 3
+ *    Brown - Arduino 5V
  * Proximity sensor B
- *    Blue  - GND
- *    Black - 4
- *    Brown - 5V  
+ *    Blue  - Arduino GND
+ *    Black - Arduino 4
+ *    Brown - Arduino 5V  
  * LCD
- *    RAW - 3.3V
- *    GND - GND
+ *    RAW - Arduino 3.3V
+ *    GND - Arduino GND
  *    SDA - Arduino SDA
  *    SCL - Arduino SCL
+ * Pressure Sensor C
+ *    PS Black to Arduino GND
+ *    PS Red to Arduino 5V
+ *    PS Yellow to Arduino A1 
+ * Pressure Sensor D
+ *    PS Black to Arduino GND
+ *    PS Red to Arduino 5V
+ *    PS Yellow to Arduino A2 
  *    
  * By: Syenna Graham   
  * 
  * TO DO:
- * 1. Test pressure sensors
- * 2. Correlate depth data to color in main loop
- * 3. Output data to SD card
+ * 1. Test and calibrate pressure sensors for real data
+ * 2. Output data to SD card
  */
 
 #include <Wire.h>
@@ -28,6 +35,8 @@
 
 const int dataINA = 3; //Proximity sensor input A (PSA)
 const int dataINB = 4; //Proximity sensor input B (PSB) 
+const int dataINC = A1; // Pressure sensor input C (PSC)
+const int dataIND = A2; // Pressure sensor input D (PSD)
 
 unsigned long prevmillis; // To store time
 unsigned long duration; // To store time difference
@@ -36,6 +45,7 @@ unsigned long refresh; // To store time for refresh of reading
 int rpmA; // RPM from sensor A value
 int rpmB; // RPM from sensor B value
 int avg_rpm; // (RPMA-RPMB)/ 2
+float depth_meters; // Depth taken from pressure sensor data
 
 boolean currentstateA; // Current state of PSA input scan
 boolean prevstateA; // State of PSA sensor in previous scan
@@ -73,10 +83,29 @@ void setup(){
     Serial.begin(9600);
 }
 
-void loop()
-{
+void loop(){
+
+    Wire.beginTransmission(DISPLAY_ADDRESS1); // transmit to device #1
+    Wire.write('|'); //Put LCD into setting mode
+    Wire.write('-'); //Send clear display command
     rpm_value();
+    depth();
     delay(50); //The maximum update rate of OpenLCD is about 100Hz (10ms). A smaller delay will cause flicker
+
+    float dep = depth_meters;
+    float top = 0.75;
+    float bottom = 0.40;
+    if( bottom < dep > top )  // If the sub is above the bot threshold and below the top threshold show a green backlite screen
+    {
+      greenON();
+    }
+    else   // If the sub is above the top threshold or below the bottom threshold show a red backlite screen
+    {
+      redON();
+    }
+
+    Wire.endTransmission(); //Stop I2C transmission
+    
 }
 
 void rpm_value()
@@ -103,8 +132,8 @@ void rpm_value()
      }
  
     prevstateA = currentstateA; // store this scan (prev scan) data for next scan
-    Serial.println("RPM A .. ");
-    Serial.println(rpmA);
+    //Serial.println("RPM A .. ");
+    //Serial.println(rpmA);
   
   
    // RPMB Measurement
@@ -123,16 +152,16 @@ void rpm_value()
          }
      }
     prevstateB = currentstateB; // store this scan (prev scan) data for next scan
-    Serial.println("RPM B .. ");
-    Serial.println(rpmB);
+    //Serial.println("RPM B .. ");
+    //Serial.println(rpmB);
   
     // Calculating average rpm 
     avg_rpm = (rpmA + rpmB) / 2;
-    Serial.println("AVERAGE RPM .. ");
+    Serial.print("AVERAGE RPM ");
     Serial.println(avg_rpm);
 
     // Send RPM data to the LCD screen 
-    Wire.print("RPM: ");
+    Wire.print("AVERAGE RPM: ");
     Wire.print(avg_rpm);
     Wire.endTransmission(); //Stop I2C transmission
 }
@@ -146,40 +175,61 @@ int depth()  // Get the pressure from the pressure sensor
     Wire.write('|'); //Setting character
     Wire.write('-'); //Clear display  
   
-  int sensorVal=analogRead(A1);
-      Serial.print("Sensor Value: ");
-      Serial.println(sensorVal);
+  int sensorValC=analogRead(dataINC);
+      Serial.print("Sensor Value C: ");
+      Serial.println(sensorValC);
+
+  int sensorValD=analogRead(dataIND);
+      Serial.print("Sensor Value D: ");
+      Serial.println(sensorValD);
   
-  float voltage = (sensorVal*5.0)/1024.0;
-      Serial.print("Volts: ");
-      Serial.println(voltage);
+  float voltageC = (sensorValC*5.0)/1024.0;
+      Serial.print("VoltsC: ");
+      Serial.println(voltageC);
+
+  float voltageD = (sensorValD*5.0)/1024.0;
+      Serial.print("VoltsD: ");
+      Serial.println(voltageD);
      
-  float pressure_pascal = (3.0*((float)voltage-0.47))*1000000.0;
+  float pressure_pascalC = (3.0*((float)voltageC-0.47))*1000000.0;
+  float pressure_pascalD = (3.0*((float)voltageD-0.47))*1000000.0;
     
-  float pressure_bar = pressure_pascal/10e5;
+  float pressure_barC = pressure_pascalC/10e5;
       Serial.print("Pressure = ");
-      Serial.print(pressure_bar);
+      Serial.print(pressure_barC);
       Serial.println(" bars");
       
-      Wire.print("Pressure: ");
-      Wire.println(pressure_bar);    
+      //Wire.print("Pressure: ");
+      //Wire.println(pressure_bar);    
       
       delay(3000);
       //return pressure_bar;
+
+  float pressure_barD = pressure_pascalD/10e5;
+      Serial.print("Pressure = ");
+      Serial.print(pressure_barD);
+      Serial.println(" bars");
+      
+      //Wire.print("Pressure: ");
+      //Wire.println(pressure_bar);    
+      
+      delay(3000);
+      //return pressure_bar;
+  float avg_pressure_bar = (pressure_barC + pressure_barD)/2;
   
   float gravity = 9.8;
   float density = 997;    
   
-  float depth_meters = pressure_bar/( gravity * density);
+  float depth_meters = avg_pressure_bar/( gravity * density);
       Serial.print("Depth = ");
       Serial.print(depth_meters, 6);
       Serial.println(" meters");
       
-      Wire.print("Depth: ");
+      Wire.print("DEPTH: ");
       Wire.println(depth_meters, 6);    
       
       delay(3000);
-      return depth_meters;
+  
   Wire.endTransmission(); //Stop I2C transmission
 }
 
