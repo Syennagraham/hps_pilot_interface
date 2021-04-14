@@ -174,7 +174,7 @@ void rpm_value()
     avg_rpm = (rpmA + rpmB) / 2;
     Serial.print("AVERAGE RPM ");
     Serial.println(avg_rpm);
-    OpenLog.println(avg_rpm);
+    OpenLog.print(avg_rpm);
 
     // Send RPM data to the LCD screen 
     Wire.print("AVERAGE RPM: ");
