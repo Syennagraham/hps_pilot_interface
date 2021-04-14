@@ -1,5 +1,7 @@
 # hps_pilot_interface
-The purpose of this repository is to provide a HPS pilot interface where the screen will become **RED** if the pilot is too close to the surface or the bottom and will become **GREEN** if the pilot is in the middle of the pool based on pressure/depth. This code will also read two RPM sensors and their average RPM out to the screen.
+The purpose of this repository is to provide a HPS pilot interface where the screen will become **RED** if the pilot is too close to the surface or the bottom and will become **GREEN** if the pilot is in the middle of the pool based on pressure/depth. This code will also read two RPM sensors and their average RPM out to the screen. 
+
+Depth and RPM Data will be written to an SD card file. Remember to change .txt extension to .csv file before importing to google sheets/excel.
 
 # TO DO:
  1. Test pressure sensors and calibrate them
@@ -38,3 +40,6 @@ Useful for resetting the LCD screen.
 [MSP Pin Descriptions](https://energia.nu/pinmaps/img/MSP-EXP432P401R.jpg)
 
 [Embedded Systems Design with the Texas Instruments MSP432 32-bit Processor](https://www.google.com/books/edition/Embedded_Systems_Design_with_the_Texas_I/EVxtDQAAQBAJ?hl=en&gbpv=0)
+
+[Arduino and SD Card Reader Integration]
+(https://astronomersanonymous.wordpress.com/2016/04/16/arduino-tutorial-for-undergraduate-students/)
