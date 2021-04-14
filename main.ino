@@ -1,5 +1,5 @@
 /*
- * This code displays RPM data to the LCD using I2C
+ * This code displays RPM and Pressure data to the LCD using I2C and to an SD card using Serial
  * Proximity sensor A 
  *    Blue  - Arduino GND
  *    Black - Arduino 3
@@ -21,22 +21,30 @@
  *    PS Black to Arduino GND
  *    PS Red to Arduino 5V
  *    PS Yellow to Arduino A2 
+ * SD Card   
+ *    SD VCC to Arduino 3.3V
+ *    SD GND to Arduino GND
+ *    SD RXI to Arduino pin 5
  *    
  * By: Syenna Graham   
  * 
  * TO DO:
  * 1. Test and calibrate pressure sensors for real data
- * 2. Output data to SD card
+ * 2. Test Output data to SD card
  */
 
 #include <Wire.h>
+#include <SoftwareSerial.h>
 
 #define DISPLAY_ADDRESS1 0x72 //This is the default address of the OpenLCD
 
-const int dataINA = 3; //Proximity sensor input A (PSA)
-const int dataINB = 4; //Proximity sensor input B (PSB) 
+//Connect RXI of OpenLog to pin 5 on Arduino
+SoftwareSerial OpenLog(0, 5); // 0 = Soft RX pin (not used), 5 = Soft TX pin
+
+const int dataINA = A3; //Proximity sensor input A (PSA)
+const int dataINB = A2; //Proximity sensor input B (PSB) 
 const int dataINC = A1; // Pressure sensor input C (PSC)
-const int dataIND = A2; // Pressure sensor input D (PSD)
+const int dataIND = A0; // Pressure sensor input D (PSD)
 
 unsigned long prevmillis; // To store time
 unsigned long duration; // To store time difference
@@ -58,10 +66,17 @@ void setup(){
     // Start communication with the LCD
     Wire.begin();
     //Wire.setClock(400000); //Optional - set I2C SCL to High Speed Mode of 400kHz
-
+    
+    OpenLog.begin(9600); //Open software serial port at 9600bps
+    OpenLog.print(" RPM :    ");
+    OpenLog.print(", ");
+    OpenLog.println(" Depth (meter) :    ");
+    
+    
     // Set up for the debugging serial monitor
     Serial.begin(9600); //Start serial communication at 9600 for debug statements
-    Serial.println("RPM DATA TO LCD CODE");
+    Serial.println("RPM AND DEPTH DATA");
+    Serial.println("Text written to file. Use SD card reader to see file.");
 
     // Set up for the LCD readings
     //Send the reset command to the display - this forces the cursor to return to the beginning of the display
@@ -132,9 +147,9 @@ void rpm_value()
      }
  
     prevstateA = currentstateA; // store this scan (prev scan) data for next scan
-    //Serial.println("RPM A .. ");
-    //Serial.println(rpmA);
-  
+    Serial.println("RPM A .. ");
+    Serial.println(rpmA);
+    
   
    // RPMB Measurement
    currentstateB = digitalRead(dataINB); // Read PSB sensor state
@@ -152,13 +167,14 @@ void rpm_value()
          }
      }
     prevstateB = currentstateB; // store this scan (prev scan) data for next scan
-    //Serial.println("RPM B .. ");
-    //Serial.println(rpmB);
+    Serial.println("RPM B .. ");
+    Serial.println(rpmB);
   
     // Calculating average rpm 
     avg_rpm = (rpmA + rpmB) / 2;
     Serial.print("AVERAGE RPM ");
     Serial.println(avg_rpm);
+    OpenLog.println(avg_rpm);
 
     // Send RPM data to the LCD screen 
     Wire.print("AVERAGE RPM: ");
@@ -224,6 +240,7 @@ int depth()  // Get the pressure from the pressure sensor
       Serial.print("Depth = ");
       Serial.print(depth_meters, 6);
       Serial.println(" meters");
+      OpenLog.println(depth_meters, 6);
       
       Wire.print("DEPTH: ");
       Wire.println(depth_meters, 6);    
