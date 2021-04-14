@@ -4,7 +4,7 @@ The purpose of this repository is to provide a HPS pilot interface where the scr
 # TO DO:
  1. Test pressure sensors and calibrate them
  2. Add correct depth calculation data for accurate pool data
- 3. Add SD card output
+ 3. Test SD card output
  4. Add timer relay for lights flashing 
 
 # Pin Connections
