@@ -5,9 +5,7 @@ Depth and RPM Data will be written to an SD card file. Remember to change .txt e
 
 # TO DO:
  1. Test pressure sensors and calibrate them
- 2. Add correct depth calculation data for accurate pool data
- 3. Test SD card output
- 4. Add timer relay for lights flashing 
+ 2. Add timer relay for lights flashing 
 
 # Pin Connections
 If your desired setup includes the MSP-EXP432P401R, the logic level converter (LLC), the LCD screen and the pressure sensor, use these pin connections below.
